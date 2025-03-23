@@ -3,7 +3,7 @@ import requests
 
 class Bot():
     def __init__(self):
-        self.TOKEN = ""
+        self.TOKEN = "7824735225:AAFCLGBnHoR9Li-n3Ga1VWrKK5PU2D1Ki3s"
         URL_BASE = f"https://api.telegram.org/bot{self.TOKEN}"
         self.getUpdateURL = f"{URL_BASE}/getUpdates"
         self.sendMessageURL = f"{URL_BASE}/sendMessage"
@@ -43,7 +43,7 @@ class Bot():
 
         try:
             requestSend = requests.post(self.sendMessageURL, data=dictData)
-            if requestSend != 200:
+            if requestSend.status_code != 200:
                 print(f"An error occurred, message: {text} not sent")
 
         except Exception as err:
