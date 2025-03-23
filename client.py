@@ -24,9 +24,9 @@ class Client():
         """Withdraw method"""
         if amount > 0 and amount <= self.balance:
             self.balance -= amount
-            self.last_withdraw = amount
             self.last_withdraw = datetime.datetime.now().replace(microsecond=0)
             self._track_transaction("withdraw", amount, self.last_withdraw)
+            return self.balance, self.last_withdraw
         else:
             print("The amount must ot be a valid value")
             return None
