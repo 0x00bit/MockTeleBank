@@ -1,6 +1,7 @@
 from bot import Bot
 from client import Client
 from database import Database
+import time
 
 
 class Server():
@@ -74,7 +75,7 @@ class Server():
 
                 if command.startswith("/createclient"):
                     try:
-                        _, username, name = command.split(" ")
+                        _, username, name = command.split(" ")  # Split the command and the parameters
                         result = self.database.createClient(username, name)
                         if result:
                             self.bot.sendMessages(chatid, f"Client '{username}' created successfully!")
@@ -86,17 +87,26 @@ class Server():
                 elif command.startswith("/checkbalance"):
                     try:
                         _, username = command.split(" ")
-                        client_data = self.database.getClient(username)
-                        if client_data:
+                        client_data = self.database.getClient(username) 
+                        if client_data:  # If the client exist, then:
                             client = Client(
                                 userid=client_data['userid'],
                                 name=client_data['name'],
                                 balance=client_data['balance'],
-                                last_deposit=client_data['last_deposit'],
-                                last_withdraw=client_data['last_withdraw']
+                                last_deposit=client_data.get('last_deposit', "No deposits yet."),
+                                last_withdraw=client_data.get('last_withdraw', "No withdrawals yet."),
+                                transaction_historic=client_data.get('transaction_historic', [])  
                             )
-                            client.check_balance()
-                            self.bot.sendMessages(chatid, f"Balance for '{username}': ${client.balance}")
+                            new_balance = client.check_balance()
+                            last_deposit = client.last_deposit
+                            last_withdraw = client.last_withdraw
+                            
+                            # Preparing the bank statement
+                            new_balance += f" \nLast deposit: {last_deposit}\n"
+                            new_balance += f" \nLast withdraw: {last_withdraw}\n"
+
+
+                            self.bot.sendMessages(chatid, f"'{username}': {new_balance}")
                         else:
                             self.bot.sendMessages(chatid, f"Client '{username}' not found.")
                     except Exception as err:
@@ -106,26 +116,41 @@ class Server():
                     try:
                         _, username, amount = command.split(" ")
                         amount = float(amount)
-                        client_data = self.database.getClient(username)
-                        if client_data:
-                            client = Client(
-                                userid=client_data['userid'],
-                                name=client_data['name'],
-                                balance=client_data['balance'],
-                                last_deposit=client_data['last_deposit'],
-                                last_withdraw=client_data['last_withdraw']
-                            )
-                            client.deposit(amount)
-                            self.database.updateClient(username, {
-                                'balance': client.balance,
-                                'last_deposit': client.last_deposit,
-                                'transaction_historic': client.transaction_history
-                            })
-                            self.bot.sendMessages(chatid, f"Deposited ${amount} to '{username}'. New balance: ${client.balance}")
+                        self.bot.sendMessages(chatid, "Do you confirm the transaction? Y/n")
+                        
+                        # Wait for the user confirmation
+                        time.sleep(4)
+                        confirmation, _ = self.bot.GetMessages()
+                        if confirmation is None:
+                            self.bot.sendMessages(chatid, "Operation cancelled by the client!")
+                            continue
+                        
+                        # Check the verification
+                        if confirmation == 'y' or confirmation == 'Y':
+                            client_data = self.database.getClient(username)
+                            if client_data:
+                                client = Client(
+                                    userid=client_data['userid'],
+                                    name=client_data['name'],
+                                    balance=client_data['balance'],
+                                    last_deposit=client_data['last_deposit'],
+                                    last_withdraw=client_data['last_withdraw']
+                                )
+                                new_balance, last_deposit = client.deposit(amount)
+                                self.database.updateClient(username, {
+                                    'balance': new_balance,
+                                    'last_deposit': last_deposit,
+                                    'transaction_historic': client.transaction_history
+                                })
+                                self.bot.sendMessages(chatid, f"Deposited ${amount} to '{username}'. New balance: ${client.balance}. Deposit at: {last_deposit}")
+                            else:
+                                self.bot.sendMessages(chatid, f"Client '{username}' not found.")  
                         else:
-                            self.bot.sendMessages(chatid, f"Client '{username}' not found.")
+                            self.bot.sendMessages(chatid, "Operation cancelled by the client!")
+                            continue
                     except Exception as err:
                         self.bot.sendMessages(chatid, f"Error depositing money: {err}")
+
 
                 elif command.startswith("/withdraw"):
                     try:
