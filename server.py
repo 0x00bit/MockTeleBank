@@ -71,7 +71,7 @@ class Server():
                         self.bot.sendMessages(chatid, self.database.getClient(username))
                         print(result)
                     except Exception as err:
-                        print(f"An error occurred: {err}")
+                        print(f"An error occurred. \nUsage: /createuser (username) (realname)")
 
                 if command.startswith("/createclient"):
                     try:
@@ -110,7 +110,7 @@ class Server():
                         else:
                             self.bot.sendMessages(chatid, f"Client '{username}' not found.")
                     except Exception as err:
-                        self.bot.sendMessages(chatid, f"Error checking balance: {err}")
+                        self.bot.sendMessages(chatid, f"Error checking balance. \n Usage: /checkbalance (user)")
 
                 elif command.startswith("/deposit"):
                     try:
@@ -149,7 +149,7 @@ class Server():
                             self.bot.sendMessages(chatid, "Operation cancelled by the client!")
                             continue
                     except Exception as err:
-                        self.bot.sendMessages(chatid, f"Error depositing money: {err}")
+                        self.bot.sendMessages(chatid, f"Error depositing money. \nUsage: /deposit (user) (amount)")
 
 
                 elif command.startswith("/withdraw"):
@@ -177,7 +177,7 @@ class Server():
                         else:
                             self.bot.sendMessages(chatid, f"Client '{username}' not found.")
                     except Exception as err:
-                        self.bot.sendMessages(chatid, f"Error withdrawing money: {err}")
+                        self.bot.sendMessages(chatid, f"Error withdrawing money. \nUsage: /withdraw (user) (amount)")
 
                 else:
                     self.bot.sendMessages(chatid, "Invalid command. Use /help for a list of commands.")
