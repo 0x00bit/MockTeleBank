@@ -186,6 +186,6 @@ class Server():
             print(f"An error occurred: {err}")
 
 
-
-server = Server()
-server.runServer()
+if __name__ == "__main__":
+    server = Server()
+    server.runServer()

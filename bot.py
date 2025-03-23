@@ -1,9 +1,22 @@
 import requests
+from dotenv import load_dotenv
+import os
+import sys
+
+token_file = "TOKEN.txt"
+if os.path.exists(token_file):
+    with open(token_file, 'r') as file:
+        global token
+        token = file.read().strip()
+        print("Token loaded successfully!")
+else:
+    print("Error: File 'TOKEN.txt' not found!")
+    sys.exit()
 
 
 class Bot():
     def __init__(self):
-        self.TOKEN = "7824735225:AAFCLGBnHoR9Li-n3Ga1VWrKK5PU2D1Ki3s"
+        self.TOKEN = token
         URL_BASE = f"https://api.telegram.org/bot{self.TOKEN}"
         self.getUpdateURL = f"{URL_BASE}/getUpdates"
         self.sendMessageURL = f"{URL_BASE}/sendMessage"
