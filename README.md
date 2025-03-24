@@ -49,6 +49,38 @@ docker run -d -p 27017:27017 --name mongodb mongo
 python server.py
 ```
 
+## With Docker
+1. Clone the repository or download the source code.
+
+2. Create a TOKEN.txt file in the root directory and paste your Telegram bot token inside.
+
+3. Build the Docker image for the bot:
+```bash
+docker build -t mock-tele-bank .
+```
+
+4. Create a Docker network to connect the bot and MongoDB:
+```bash
+docker build -t mock-tele-bank .
+```
+
+5. Run a MongoDB container in the created network:
+```bash
+docker build -t mock-tele-bank .
+```
+
+6. Run the bot container in the same network:
+```bash
+docker run -d --name mock-bank-bot --network mock-bank-network -p 8000:8000 mock-tele-bank
+```
+
+7. The bot should now be running and connected to the MongoDB instance.
+
+8. If the bot don't run, you can try to change the line 6 to:
+```bash
+self.client = MongoClient("mongodb://mongodb:27017")
+```
+
 ## Features
 - **Check Balance:** View the current balance and the last deposit or withdrawal details.
 - **Deposit:** Add funds to the client's account.
